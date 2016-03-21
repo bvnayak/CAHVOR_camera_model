@@ -2,10 +2,10 @@ import numpy as np
 import math
 
 
-class pinhole_model(object):
+class photogrammetric_model(object):
 
     def __init__(self):
-        print('Enter Vector/Matrix Elements Row by Row with Space in between')
+        print('Note: Enter Vector Elements Row by Row with Space in between')
         self.principal = input('Enter Principal Point (x0, y0): ')
         self.principal = [float(x) for x in self.principal.split()]
         self.imsize = input('Enter Image Size (Row, Column): ')
@@ -21,6 +21,7 @@ class pinhole_model(object):
         self.compute_rotation_matrix(w, phi, k)
 
     def compute_rotation_matrix(self, w, phi, k):
+        '''
         ##################################################################################################
         # self.rotation = Rotational Matrix M                                                            #
         #                                                                                                #
@@ -29,12 +30,14 @@ class pinhole_model(object):
         #     [   sin(phi)              -sin(w)cos(phi)                        cos(w)cos(phi)         ]  #
         #                                                                                                #
         ##################################################################################################
+        '''
 
         # Degree to Radians
         w = math.radians(w)
         phi = math.radians(phi)
         k = math.radians(k)
 
+        # Rotational Matrix M generation
         self.r_matrix = np.zeros((3, 3))
         self.r_matrix[0, 0] = math.cos(phi) * math.cos(k)
         self.r_matrix[0, 1] = math.sin(w) * math.sin(phi) * math.cos(k) + math.cos(w) * math.sin(k)
@@ -77,4 +80,4 @@ class pinhole_model(object):
 
 
 if __name__ == '__main__':
-    pinhole_model()
+    photogrammetric_model()
