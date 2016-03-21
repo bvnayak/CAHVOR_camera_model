@@ -6,6 +6,10 @@ Dependancies
 ------------
 * Numpy
 
+CAHVOR model
+------------
+* CAHVOR camera model [details](http://pds-imaging.jpl.nasa.gov/data/mer/spirit/mer2no_0xxx/document/geometric_cm.txt)
+
 Input
 -----
 Camera matrix parameters generated from camera calibration
