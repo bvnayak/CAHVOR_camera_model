@@ -5,18 +5,24 @@ import math
 class photogrammetric_model(object):
 
     def __init__(self):
+        print("--------------------------------------------------------------")
+        print("")
         print('Note: Enter Vector Elements Row by Row with Space in between')
-        self.principal = input('Enter Principal Point (x0, y0): ')
+        print("")
+        print("--------------------------------------------------------------")
+        print("")
+        self.principal = raw_input('Enter Principal Point (x0, y0): ')
         self.principal = [float(x) for x in self.principal.split()]
-        self.imsize = input('Enter Image Size (Row, Column): ')
+        self.imsize = raw_input('Enter Image Size (Row, Column): ')
         self.imsize = [float(x) for x in self.imsize.split()]
         self.focallength = float(input('Enter Focal Length in mm: '))
-        self.center = input('Enter Camera Center (Xc, Yc, Zc): ')
+        self.center = raw_input('Enter Camera Center (Xc, Yc, Zc): ')
         self.center = [float(x) for x in self.center.split()]
-        self.pixelsize = float(input('Enter pixel size in mm: '))
-        w = float(input('Enter Rotation Angle w: '))
-        phi = float(input('Enter Rotation Angle phi: '))
-        k = float(input('Enter Rotation Angle k: '))
+        self.pixelsize = float(raw_input('Enter pixel size in mm: '))
+        w = float(raw_input('Enter Rotation Angle w: '))
+        phi = float(raw_input('Enter Rotation Angle phi: '))
+        k = float(raw_input('Enter Rotation Angle k: '))
+        print("")
 
         self.compute_rotation_matrix(w, phi, k)
 
@@ -65,7 +71,7 @@ class photogrammetric_model(object):
         V = vs * Vn + vc * A
 
         print("--------------------------------------------------------------")
-        print()
+        print("")
         print("hs: ", hs)
         print("vs: ", vs)
         print("hc: ", hc)
@@ -75,7 +81,7 @@ class photogrammetric_model(object):
         print('A: ', A)
         print('H: ', H)
         print('V: ', V)
-        print()
+        print("")
         print("--------------------------------------------------------------")
 
 
