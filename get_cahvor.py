@@ -22,6 +22,8 @@ class photogrammetric_model(object):
         w = float(input('Enter Rotation Angle w: '))
         phi = float(input('Enter Rotation Angle phi: '))
         k = float(input('Enter Rotation Angle k: '))
+        self.k = input('Enter Distortion Parameters (k0, k1, k2): ')
+        self.k = [float(x) for x in self.k.split()]
         print("")
 
         self.compute_rotation_matrix(w, phi, k)
@@ -69,6 +71,8 @@ class photogrammetric_model(object):
 
         H = hs * Hn + hc * A
         V = vs * Vn + vc * A
+        O = A        # We assume O = A in converted CAHVOR Model
+        R = np.array([self.k[0], self.k[1]*(self.focallength**2), self.k[2]*(self.focallength**4)])
 
         print("--------------------------------------------------------------")
         print("")
@@ -81,6 +85,8 @@ class photogrammetric_model(object):
         print('A: ', A)
         print('H: ', H)
         print('V: ', V)
+        print('O: ', O)
+        print('R: ', R)
         print("")
         print("--------------------------------------------------------------")
 
