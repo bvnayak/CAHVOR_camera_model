@@ -2,13 +2,11 @@ import numpy as np
 import math
 
 
-class photogrammetric_model(object):
+class PhotogrammetricModel(object):
 
     def __init__(self):
         print("--------------------------------------------------------------")
-        print("")
         print('Note: Enter Vector Elements Row by Row with Space in between')
-        print("")
         print("--------------------------------------------------------------")
         print("")
         self.principal = input('Enter Principal Point (x0, y0): ')
@@ -22,74 +20,91 @@ class photogrammetric_model(object):
         w = float(input('Enter Rotation Angle w: '))
         phi = float(input('Enter Rotation Angle phi: '))
         k = float(input('Enter Rotation Angle k: '))
-        self.k = input('Enter Distortion Parameters (k0, k1, k2): ')
-        self.k = [float(x) for x in self.k.split()]
+        self.distortion = input('Enter Distortion Parameters (k0, k1, k2): ')
+        self.distortion = [float(x) for x in self.distortion.split()]
         print("")
 
-        self.compute_rotation_matrix(w, phi, k)
+        self.r_matrix = compute_rotation_matrix(w, phi, k)
+        pinhole_model = dict([('C', self.center),
+                              ('imsize', self.imsize),
+                              ('pixel_size', self.pixelsize),
+                              ('r_mat', self.r_matrix),
+                              ('f', self.focallength),
+                              ('P', self.principal),
+                              ('K', self.distortion)
+                              ])
+        self.cahvor = compute_CAHVOR(pinhole_model)
+        print_CAHVOR(self.cahvor)
 
-    def compute_rotation_matrix(self, w, phi, k):
-        '''
-        ##################################################################################################
-        # self.rotation = Rotational Matrix M                                                            #
-        #                                                                                                #
-        #     [cos(phi)cos(k)   sin(w)sin(phi)cos(k)+cos(w)sin(k)   -cos(w)sin(phi)cos(k)+sin(w)sin(k)]  # 
-        # M = [-cos(phi)sin(k)  -sin(w)sin(phi)sin(k)+cos(w)cos(k)  cos(w)sin(phi)sin(k)+sin(w)cos(k) ]  #
-        #     [   sin(phi)              -sin(w)cos(phi)                        cos(w)cos(phi)         ]  #
-        #                                                                                                #
-        ##################################################################################################
-        '''
 
-        # Degree to Radians
-        w = math.radians(w)
-        phi = math.radians(phi)
-        k = math.radians(k)
+def compute_rotation_matrix(w, phi, k):
+    '''
+    ##################################################################################################
+    # self.rotation = Rotational Matrix M                                                            #
+    #                                                                                                #
+    #     [cos(phi)cos(k)   sin(w)sin(phi)cos(k)+cos(w)sin(k)   -cos(w)sin(phi)cos(k)+sin(w)sin(k)]  #
+    # M = [-cos(phi)sin(k)  -sin(w)sin(phi)sin(k)+cos(w)cos(k)  cos(w)sin(phi)sin(k)+sin(w)cos(k) ]  #
+    #     [   sin(phi)              -sin(w)cos(phi)                        cos(w)cos(phi)         ]  #
+    #                                                                                                #
+    ##################################################################################################
+    '''
 
-        # Rotational Matrix M generation
-        self.r_matrix = np.zeros((3, 3))
-        self.r_matrix[0, 0] = math.cos(phi) * math.cos(k)
-        self.r_matrix[0, 1] = math.sin(w) * math.sin(phi) * math.cos(k) + math.cos(w) * math.sin(k)
-        self.r_matrix[0, 2] = - math.cos(w) * math.sin(phi) * math.cos(k) + math.sin(w) * math.sin(k)
-        self.r_matrix[1, 0] = - math.cos(phi) * math.sin(k)
-        self.r_matrix[1, 1] = - math.sin(w) * math.sin(phi) * math.sin(k) + math.cos(w) * math.cos(k)
-        self.r_matrix[1, 2] = math.cos(w) * math.sin(phi) * math.sin(k) + math.sin(w) * math.cos(k)
-        self.r_matrix[2, 0] = math.sin(phi)
-        self.r_matrix[2, 1] = - math.sin(w) * math.cos(phi)
-        self.r_matrix[2, 2] = math.cos(w) * math.cos(phi)
+    # Degree to Radians
+    w = math.radians(w)
+    phi = math.radians(phi)
+    k = math.radians(k)
 
-        self.compute_CAHV()
+    # Rotational Matrix M generation
+    r_matrix = np.zeros((3, 3))
+    r_matrix[0, 0] = math.cos(phi) * math.cos(k)
+    r_matrix[0, 1] = math.sin(w) * math.sin(phi) * math.cos(k) + math.cos(w) * math.sin(k)
+    r_matrix[0, 2] = - math.cos(w) * math.sin(phi) * math.cos(k) + math.sin(w) * math.sin(k)
+    r_matrix[1, 0] = - math.cos(phi) * math.sin(k)
+    r_matrix[1, 1] = - math.sin(w) * math.sin(phi) * math.sin(k) + math.cos(w) * math.cos(k)
+    r_matrix[1, 2] = math.cos(w) * math.sin(phi) * math.sin(k) + math.sin(w) * math.cos(k)
+    r_matrix[2, 0] = math.sin(phi)
+    r_matrix[2, 1] = - math.sin(w) * math.cos(phi)
+    r_matrix[2, 2] = math.cos(w) * math.cos(phi)
 
-    def compute_CAHV(self):
-        hs = self.focallength / self.pixelsize
-        vs = self.focallength / self.pixelsize
-        hc = (self.imsize[1] / 2) + (self.principal[0] / self.pixelsize)
-        vc = (self.imsize[0] / 2) - (self.principal[1] / self.pixelsize)
+    return r_matrix
 
-        A = - self.r_matrix[2, :]
-        Hn = self.r_matrix[0, :]
-        Vn = - self.r_matrix[1, :]
 
-        H = hs * Hn + hc * A
-        V = vs * Vn + vc * A
-        O = A        # We assume O = A in converted CAHVOR Model
-        R = np.array([self.k[0], self.k[1]*(self.focallength**2), self.k[2]*(self.focallength**4)])
+def compute_CAHVOR(pinhole_model):
+    hs = pinhole_model['f'] / pinhole_model['pixel_size']
+    vs = pinhole_model['f'] / pinhole_model['pixel_size']
+    hc = (pinhole_model['imsize'][1] / 2) + (pinhole_model['P'][0] / pinhole_model['pixel_size'])
+    vc = (pinhole_model['imsize'][0] / 2) - (pinhole_model['P'][1] / pinhole_model['pixel_size'])
 
-        print("--------------------------------------------------------------")
-        print("")
-        print("hs: ", hs)
-        print("vs: ", vs)
-        print("hc: ", hc)
-        print("vc: ", vc)
+    C = pinhole_model['C']
+    A = - pinhole_model['r_mat'][2, :]
+    Hn = pinhole_model['r_mat'][0, :]
+    Vn = - pinhole_model['r_mat'][1, :]
 
-        print('C: ', self.center)
-        print('A: ', A)
-        print('H: ', H)
-        print('V: ', V)
-        print('O: ', O)
-        print('R: ', R)
-        print("")
-        print("--------------------------------------------------------------")
+    H = hs * Hn + hc * A
+    V = vs * Vn + vc * A
+    O = A        # We assume O = A in converted CAHVOR Model
+    R = pinhole_model['K']
+    R = np.array([R[0], R[1]*(pinhole_model['f']**2), R[2]*(pinhole_model['f']**4)])
+    cahvor = dict([('C', C), ('A', A), ('H', H), ('V', V), ('O', O), ('R', R), ('hs', hs), ('hc', hc), ('vs', vs), ('vc', vc)])
+    return cahvor
 
+
+def print_CAHVOR(cahvor):
+    print("--------------------------------------------------------------")
+    print("")
+    print("hs: ", cahvor['hs'])
+    print("vs: ", cahvor['vs'])
+    print("hc: ", cahvor['hc'])
+    print("vc: ", cahvor['vc'])
+
+    print('C: ', cahvor['C'])
+    print('A: ', cahvor['A'])
+    print('H: ', cahvor['H'])
+    print('V: ', cahvor['V'])
+    print('O: ', cahvor['O'])
+    print('R: ', cahvor['R'])
+    print("")
+    print("--------------------------------------------------------------")
 
 if __name__ == '__main__':
-    photogrammetric_model()
+    cahvor = PhotogrammetricModel()
