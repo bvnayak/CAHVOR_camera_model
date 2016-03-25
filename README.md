@@ -17,6 +17,22 @@ Camera matrix parameters generated from camera calibration
 
 (NOTE: User must have `EXTRINSIC` and `INTRINSIC` camera parameters generated from Camera Calibration)
 
+Usage
+-----
+
+* Python3
+
+  ```
+  >>> from get_cahvor import PhotogrammetricModel
+  >>> a = PhotogrammetricModel()
+  >>> a.cahvor
+  ```
+* command-line
+
+  ```
+  $ python3 get_cahvor.py
+  ```
+
 Results
 -------
 ```
