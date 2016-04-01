@@ -1,21 +1,25 @@
 # CAHVOR_camera_model - Python Implementation
 * Converting Photogrammetric Parameters to CAHVOR
+* Converting CAHVOR to Photogrammetric Model
 * Python Implentation of [CAHVOR camera model and its photogrammetric conversion for planetary applications](http://onlinelibrary.wiley.com/doi/10.1029/2003JE002199/full)
 
 Dependancies
 ------------
 * Python3
 * Numpy
+* math
 
 CAHVOR model
 ------------
 * CAHVOR camera model [details](http://pds-imaging.jpl.nasa.gov/data/mer/spirit/mer2no_0xxx/document/geometric_cm.txt)
+* Photogrametric model [details](http://ksimek.github.io/2012/08/14/decompose/)
 
-Input
------
-Camera matrix parameters generated from camera calibration
+Input Requirements
+------------------
+* pixel size
+* Image Size
 
-(NOTE: User must have `EXTRINSIC` and `INTRINSIC` camera parameters generated from Camera Calibration)
+(NOTE: Deepending on the application, user must have `EXTRINSIC` and `INTRINSIC` camera parameters -OR- `CAHVOR` generated from Camera Calibration)
 
 Usage
 -----
