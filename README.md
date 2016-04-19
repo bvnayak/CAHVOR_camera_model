@@ -33,7 +33,7 @@ Usage
   ```
   ```
   >>> from get_cahvor import PhotogrammetricModel
-  >>> print(model)  # Model is dict type
+  >>> print(model)  # model is dict type
   {'center': [3.451904, 3.258335, 1.254338],
  'f': 29.4711992,
  'image_size': [506, 762],
