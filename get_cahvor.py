@@ -4,35 +4,43 @@ import math
 
 class PhotogrammetricModel(object):
 
-    def __init__(self):
-        print("--------------------------------------------------------------")
-        print('Note: Enter Vector Elements Row by Row with Space in between')
-        print("--------------------------------------------------------------")
-        print("")
-        self.principal = input('Enter Principal Point (x0, y0): ')
-        self.principal = [float(x) for x in self.principal.split()]
-        self.imsize = input('Enter Image Size (Row, Column): ')
-        self.imsize = [float(x) for x in self.imsize.split()]
-        self.focallength = float(input('Enter Focal Length in mm: '))
-        self.center = input('Enter Camera Center (Xc, Yc, Zc): ')
-        self.center = [float(x) for x in self.center.split()]
-        self.pixelsize = float(input('Enter pixel size in mm: '))
-        w = float(input('Enter Rotation Angle w: '))
-        phi = float(input('Enter Rotation Angle phi: '))
-        k = float(input('Enter Rotation Angle k: '))
-        self.distortion = input('Enter Distortion Parameters (k0, k1, k2): ')
-        self.distortion = [float(x) for x in self.distortion.split()]
-        print("")
+    def __init__(self, dict_ip=None):
+        if dict_ip is None:
+            print("----------------------------------------------------------")
+            print('Note: Enter Vector Inputs Row by Row with Space in between')
+            print("----------------------------------------------------------")
+            print("")
+            self.principal = input('Enter Principal Point (x0, y0): ')
+            self.principal = [float(x) for x in self.principal.split()]
+            self.imsize = input('Enter Image Size (Row, Column): ')
+            self.imsize = [float(x) for x in self.imsize.split()]
+            self.focallength = float(input('Enter Focal Length in mm: '))
+            self.center = input('Enter Camera Center (Xc, Yc, Zc): ')
+            self.center = [float(x) for x in self.center.split()]
+            self.pixelsize = float(input('Enter pixel size in mm: '))
+            w = float(input('Enter Rotation Angle w: '))
+            phi = float(input('Enter Rotation Angle phi: '))
+            k = float(input('Enter Rotation Angle k: '))
+            self.distortion = input('Enter Distortion Parameters (k0, k1, k2): ')
+            self.distortion = [float(x) for x in self.distortion.split()]
+            print("")
+            self.r_matrix = compute_rotation_matrix(w, phi, k)
+            pinhole_model = dict([('C', self.center),
+                                  ('imsize', self.imsize),
+                                  ('pixel_size', self.pixelsize),
+                                  ('r_mat', self.r_matrix),
+                                  ('f', self.focallength),
+                                  ('P', self.principal),
+                                  ('K', self.distortion)])
+        else:
+            pinhole_model = dict([('C', dict_ip['center']),
+                                  ('imsize', dict_ip['image_size']),
+                                  ('pixel_size', dict_ip['pixelsize']),
+                                  ('r_mat', dict_ip['rotation_mat']),
+                                  ('f', dict_ip['f']),
+                                  ('P', dict_ip['principal']),
+                                  ('K', None)])
 
-        self.r_matrix = compute_rotation_matrix(w, phi, k)
-        pinhole_model = dict([('C', self.center),
-                              ('imsize', self.imsize),
-                              ('pixel_size', self.pixelsize),
-                              ('r_mat', self.r_matrix),
-                              ('f', self.focallength),
-                              ('P', self.principal),
-                              ('K', self.distortion)
-                              ])
         self.cahvor = compute_CAHVOR(pinhole_model)
         print_CAHVOR(self.cahvor)
 
@@ -84,8 +92,11 @@ def compute_CAHVOR(pinhole_model):
     V = vs * Vn + vc * A
     O = A        # We assume O = A in converted CAHVOR Model
     R = pinhole_model['K']
-    R = np.array([R[0], R[1]*(pinhole_model['f']**2), R[2]*(pinhole_model['f']**4)])
-    cahvor = dict([('C', C), ('A', A), ('H', H), ('V', V), ('O', O), ('R', R), ('hs', hs), ('hc', hc), ('vs', vs), ('vc', vc)])
+    if not(R is None):
+        R = np.array([R[0], R[1] * (pinhole_model['f']**2),
+                      R[2] * (pinhole_model['f']**4)])
+    cahvor = dict([('C', C), ('A', A), ('H', H), ('V', V), ('O', O), ('R', R),
+                   ('hs', hs), ('hc', hc), ('vs', vs), ('vc', vc)])
     return cahvor
 
 
