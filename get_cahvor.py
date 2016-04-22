@@ -83,7 +83,7 @@ def compute_CAHVOR(pinhole_model):
 
     Parameters
     ----------
-    dict: dict
+    pinhole_model: dict
         Take dictionary containing photogrammetric camera Parameters
         such as 'camera center', 'focallength', 'rotation matrix',
         'pixel size', 'principal point', 'image size' and 'az' and 'el'
