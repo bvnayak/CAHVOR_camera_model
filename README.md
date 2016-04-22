@@ -27,12 +27,12 @@ Usage
 * Python3
 
   ```
-  >>> from get_cahvor import PhotogrammetricModel
-  >>> a = PhotogrammetricModel()
+  >>> from get_cahvor import CAHVOR
+  >>> a = CAHVOR()
   >>> a.cahvor
   ```
   ```
-  >>> from get_cahvor import PhotogrammetricModel
+  >>> import get_cahvor
   >>> print(model)  # model is dict type
   {'center': [3.451904, 3.258335, 1.254338],
  'f': 29.4711992,
@@ -41,9 +41,11 @@ Usage
  'principal': [-0.09574394, -0.11071695],
  'rotation_mat': array([[-0.69620161,  0.71768083, -0.01541225],
         [-0.16672233, -0.14077498,  0.97590269],
-        [ 0.698217  ,  0.6819946 ,  0.21766119]])}
-  >>> a = PhotogrammetricModel(model)
-  >>> a.cahvor
+        [ 0.698217  ,  0.6819946 ,  0.21766119]]),
+  'az': 90,
+  'el': 0}
+  >>> a = get_cahvor.compute_CAHVOR(model)
+  >>> a
   ```
 
 * command-line
