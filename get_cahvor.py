@@ -39,16 +39,19 @@ class CAHVOR(object):
 
 
 def compute_rotation_matrix(w, phi, k):
-    '''
-    ##################################################################################################
-    # self.rotation = Rotational Matrix M                                                            #
-    #                                                                                                #
-    #     [cos(phi)cos(k)   sin(w)sin(phi)cos(k)+cos(w)sin(k)   -cos(w)sin(phi)cos(k)+sin(w)sin(k)]  #
-    # M = [-cos(phi)sin(k)  -sin(w)sin(phi)sin(k)+cos(w)cos(k)  cos(w)sin(phi)sin(k)+sin(w)cos(k) ]  #
-    #     [   sin(phi)              -sin(w)cos(phi)                        cos(w)cos(phi)         ]  #
-    #                                                                                                #
-    ##################################################################################################
-    '''
+    """
+    Computes Rotation matrix from the rotation angle w, phi, k
+    related to x, y and z.
+
+    Returns
+    -------
+    r_matrix: Rotational Matrix M
+
+         [cos(phi)cos(k)   sin(w)sin(phi)cos(k)+cos(w)sin(k)   -cos(w)sin(phi)cos(k)+sin(w)sin(k)]
+     M = [-cos(phi)sin(k)  -sin(w)sin(phi)sin(k)+cos(w)cos(k)  cos(w)sin(phi)sin(k)+sin(w)cos(k) ]
+         [   sin(phi)              -sin(w)cos(phi)                        cos(w)cos(phi)         ]
+
+    """
 
     # Degree to Radians
     w = math.radians(w)
@@ -75,6 +78,22 @@ def compute_rotation_matrix(w, phi, k):
 
 
 def compute_CAHVOR(pinhole_model):
+    """
+    Computation of CAHVOR from photogrammetric parameters.
+
+    Parameters
+    ----------
+    dict: dict
+        Take dictionary containing photogrammetric camera Parameters
+        such as 'camera center', 'focallength', 'rotation matrix',
+        'pixel size', 'principal point', 'image size' and 'az' and 'el'
+        to get back to origin position of PTU.
+
+    Returns:
+    cahvor: dict
+        Returns dict containing computed CAHVOR parameters from
+        photogrammetric model.
+    """
     hs = pinhole_model['f'] / pinhole_model['pixelsize']
     vs = pinhole_model['f'] / pinhole_model['pixelsize']
     hc = (pinhole_model['image_size'][1] / 2) + \
