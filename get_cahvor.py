@@ -31,7 +31,7 @@ class CAHVOR(object):
                               ('rotation_mat', self.r_matrix),
                               ('f', self.focallength),
                               ('principal', self.principal),
-                              ('K', self.distortion)
+                              ('K', self.distortion),
                               ('az', 0), ('el', 0)])
 
         self.cahvor = compute_CAHVOR(pinhole_model)
