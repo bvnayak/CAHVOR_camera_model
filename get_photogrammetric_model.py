@@ -1,8 +1,9 @@
 import numpy as np
 import math
+from get_cahvor import compute_rotation_matrix
 
 
-class CAHVORModel(object):
+class PhotogrammetricModel(object):
 
     def __init__(self):
         print("--------------------------------------------------------------")
@@ -30,20 +31,14 @@ class CAHVORModel(object):
         self.hc = float(input('Enter hc: '))
         self.vc = float(input('Enter vc: '))
         print("")
-
-        self.r_matrix = compute_rotation_matrix(self.A, self.H, self.V,
-                                                self.hs, self.vs, self.hc,
-                                                self.vc)
-        cahvor_model = dict([('C', self.C),
-                             ('A', self.A),
-                             ('H', self.H),
-                             ('V', self.V),
-                             ('O', self.O),
-                             ('R', self.R),
-                             ('hs', self.hs),
-                             ('vs', self.vs),
-                             ('hc', self.hc),
-                             ('vc', self.vc),
+        self.r_matrix = make_rotation_matrix(self.A, self.H, self.V,
+                                             self.hs, self.vs, self.hc,
+                                             self.vc)
+        cahvor_model = dict([('C', self.C), ('A', self.A),
+                             ('H', self.H), ('V', self.V),
+                             ('O', self.O), ('R', self.R),
+                             ('hs', self.hs), ('vs', self.vs),
+                             ('hc', self.hc), ('vc', self.vc),
                              ('imsize', self.imsize),
                              ('pixel_size', self.pixelsize),
                              ('r_matrix', self.r_matrix),
@@ -52,8 +47,8 @@ class CAHVORModel(object):
         print_photogrammetric(self.photogrammetric)
 
 
-def compute_rotation_matrix(A, H, V, hs, vs, hc, vc):
-    '''
+def make_rotation_matrix(A, H, V, hs, vs, hc, vc):
+    """
     ############################################
     # self.rotation = Rotational Matrix M      #
     #                                          #
@@ -62,7 +57,7 @@ def compute_rotation_matrix(A, H, V, hs, vs, hc, vc):
     #                 [ -A  ]                  #
     #                                          #
     ############################################
-    '''
+    """
 
     # Compute H'
     H_n = (np.array(H) - (hc * np.array(A))) / hs
@@ -80,6 +75,23 @@ def compute_rotation_matrix(A, H, V, hs, vs, hc, vc):
 
 
 def compute_photogrammetric(CAHVOR_model):
+    """
+    Computation of photogrammetric parameters form CAHVOR.
+
+    Parameters
+    ----------
+    CAHVOR: dict
+        Take dictionary containing CAHVOR model and other parameters such as
+        'hs', 'vs', 'hc' and 'vc'.
+
+    Returns:
+    photogrammetric: dict
+        Returns dict containing computed photogrammetric parameters from
+        CAHVOR model. Photogrammetric camera Parameters such as
+        'camera center', 'focallength', 'rotation angles', 'rotation matrix',
+        'pixel size', 'principal point', 'image size' and 'az' and 'el'
+        to get back to origin position of PTU.
+    """
     M = CAHVOR_model['r_matrix']
     f = CAHVOR_model['pixel_size'] * CAHVOR_model['hs']
 
@@ -101,13 +113,16 @@ def compute_photogrammetric(CAHVOR_model):
     k1 = CAHVOR_model['R'][1] / (f**2)
     k2 = CAHVOR_model['R'][2] / (f**4)
 
-    x0 = CAHVOR_model['pixel_size'] * (CAHVOR_model['hc'] - (CAHVOR_model['imsize'][1]/2))
-    y0 = - CAHVOR_model['pixel_size'] * (CAHVOR_model['vc'] - (CAHVOR_model['imsize'][0]/2))
+    x0 = CAHVOR_model['pixel_size'] * \
+        (CAHVOR_model['hc'] - (CAHVOR_model['imsize'][1] / 2))
+    y0 = - CAHVOR_model['pixel_size'] * \
+        (CAHVOR_model['vc'] - (CAHVOR_model['imsize'][0] / 2))
+    R = compute_rotation_matrix(w, phi, k)
 
     photogrammetric = dict([('M', M), ('f', f), ('Xc', Xc), ('Yc', Yc),
                             ('Zc', Zc), ('w', w), ('phi', phi), ('k', k),
                             ('k0', k0), ('k1', k1), ('k2', k2), ('x0', x0),
-                            ('y0', y0)])
+                            ('y0', y0), ('R', R)])
     return photogrammetric
 
 
@@ -133,4 +148,4 @@ def print_photogrammetric(photogrammetric):
     print("--------------------------------------------------------------")
 
 if __name__ == '__main__':
-    camera_matrix = CAHVORModel()
+    camera_matrix = PhotogrammetricModel()
