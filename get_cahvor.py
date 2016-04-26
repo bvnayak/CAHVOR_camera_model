@@ -111,10 +111,10 @@ def compute_CAHVOR(pinhole_model):
     O = A        # We assume O = A in converted CAHVOR Model
 
     # Fixing Axis specifically for PTU unit.
-    A[0], A[1], A[2] = A[2], -A[0], -A[1]
-    H[0], H[1], H[2] = H[2], -H[0], -H[1]
-    V[0], V[1], V[2] = V[2], -V[0], -V[1]
-    O[0], O[1], O[2] = O[2], -O[0], -O[1]
+    # A[0], A[1], A[2] = A[2], -A[0], -A[1]
+    # H[0], H[1], H[2] = H[2], -H[0], -H[1]
+    # V[0], V[1], V[2] = V[2], -V[0], -V[1]
+    # O[0], O[1], O[2] = O[2], -O[0], -O[1]
 
     A = compute_coordinates(A, pinhole_model['az'], pinhole_model['el'])
     H = compute_coordinates(H, pinhole_model['az'], pinhole_model['el'])

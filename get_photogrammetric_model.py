@@ -31,9 +31,7 @@ class PhotogrammetricModel(object):
         self.hc = float(input('Enter hc: '))
         self.vc = float(input('Enter vc: '))
         print("")
-        self.r_matrix = make_rotation_matrix(self.A, self.H, self.V,
-                                             self.hs, self.vs, self.hc,
-                                             self.vc)
+
         cahvor_model = dict([('C', self.C), ('A', self.A),
                              ('H', self.H), ('V', self.V),
                              ('O', self.O), ('R', self.R),
@@ -41,7 +39,6 @@ class PhotogrammetricModel(object):
                              ('hc', self.hc), ('vc', self.vc),
                              ('imsize', self.imsize),
                              ('pixel_size', self.pixelsize),
-                             ('r_matrix', self.r_matrix),
                              ])
         self.photogrammetric = compute_photogrammetric(cahvor_model)
         print_photogrammetric(self.photogrammetric)
@@ -92,7 +89,11 @@ def compute_photogrammetric(CAHVOR_model):
         'pixel size', 'principal point', 'image size' and 'az' and 'el'
         to get back to origin position of PTU.
     """
-    M = CAHVOR_model['r_matrix']
+    r_matrix = make_rotation_matrix(CAHVOR_model['A'], CAHVOR_model['H'],
+                                    CAHVOR_model['V'], CAHVOR_model['hs'],
+                                    CAHVOR_model['vs'], CAHVOR_model['hc'],
+                                    CAHVOR_model['vc'])
+    M = r_matrix
     f = CAHVOR_model['pixel_size'] * CAHVOR_model['hs']
 
     # camera center
@@ -101,9 +102,9 @@ def compute_photogrammetric(CAHVOR_model):
     Zc = CAHVOR_model['C'][2]
 
     # angles
-    phi = math.asin(CAHVOR_model['r_matrix'][2][0])
-    w = - math.asin(CAHVOR_model['r_matrix'][2][1] / math.cos(phi))
-    k = math.acos(CAHVOR_model['r_matrix'][0][0] / math.cos(phi))
+    phi = math.asin(r_matrix[2][0])
+    w = - math.asin(r_matrix[2][1] / math.cos(phi))
+    k = math.acos(r_matrix[0][0] / math.cos(phi))
 
     w = math.degrees(w)
     phi = math.degrees(phi)
